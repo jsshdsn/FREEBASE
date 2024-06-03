@@ -44,6 +44,8 @@ contract FreebaseMasterBase is Ownable {
     // Bonus multiplier for early contributors.
     uint256 public constant BONUS_MULTIPLIER = 1; // no bonus
 
+    // Reward tokens get distributed from there. Can be improved by sending the rewards to this contract
+    // and then distribute it from here.
     address public bankAddr;
 
     // Info of each pool.
@@ -151,6 +153,7 @@ contract FreebaseMasterBase is Ownable {
         }
         uint256 multiplier = getMultiplier(pool.lastRewardBlock, block.number);
         uint256 reward = (multiplier * rewardPerBlock * pool.allocPoint) / totalAllocPoint;
+        // Transfer rewards from bank to this contract
         freebaseToken.safeTransferFrom(bankAddr, address(this), reward);
         pool.accRewardPerShare = pool.accRewardPerShare + ((reward * 1e12) / lpSupply);
         pool.lastRewardBlock = block.number;
