@@ -16,6 +16,13 @@ loop.loop = true;
 
 import allowList from "../../airdrop-merkle-tree/tree.json";
 
+type Countdown = {
+  days: number;
+  hours: number;
+  minutes: number;
+  seconds: number;
+};
+
 function App() {
   const [soundStarted, setSoundStarted] = useState(false);
   const [claimable, setClaimable] = useState(true);
@@ -25,6 +32,31 @@ function App() {
   const { contract: airdropContract } = useContract(
     import.meta.env.VITE_AIRDROP_CONTRACT_ADDRESS
   );
+
+  const formatTime = (time: number) => (time < 10 ? `0${time}` : time);
+
+  const calculateTimeLeft = () => {
+    const difference = +new Date("2024-06-23") - +new Date();
+    let timeLeft: Countdown = {
+      days: 0,
+      hours: 0,
+      minutes: 0,
+      seconds: 0,
+    };
+
+    if (difference > 0) {
+      timeLeft = {
+        days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+        minutes: Math.floor((difference / 1000 / 60) % 60),
+        seconds: Math.floor((difference / 1000) % 60),
+      };
+    }
+
+    return timeLeft;
+  };
+
+  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
 
   const getMaxClaimable = (address: string) => {
     const entry = allowList.find(
@@ -75,6 +107,14 @@ function App() {
       readVerifyClaim();
     }
   }, [address, airdropContract]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setTimeLeft(calculateTimeLeft());
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  });
 
   const handleClaimErrors = (error: any) => {
     if (error && error.code === 4001) {
@@ -140,13 +180,26 @@ function App() {
 
   return (
     <main className="crt w-full bg-black text-primary h-dvh flex items-center justify-center flex-col space-y-4 p-3 font-mono text-sm lg:text-base">
+      <div>
+        <div className="text-4xl sm:text-5xl md:text-6xl text-center">
+          <span>{formatTime(timeLeft["days"])}</span>
+          <span>:</span>
+          <span>{formatTime(timeLeft["hours"])}</span>
+          <span>:</span>
+          <span>{formatTime(timeLeft["minutes"])}</span>
+          <span>:</span>
+          <span>{formatTime(timeLeft["seconds"])}</span>
+        </div>
+        <p className="text-center uppercase text-xs sm:text-sm md:text-base lg:text-lg">
+          until the freebase experience
+        </p>
+      </div>
+
       <div className="flex flex-col items-center">
         <img src="logo.png"></img>
       </div>
 
       <p>Claim your tokens.</p>
-
-      {/* <button onClick={() => sound.play()}>Hi</button> */}
 
       <ConnectWallet
         switchToActiveChain={true}
