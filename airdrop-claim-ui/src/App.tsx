@@ -14,7 +14,7 @@ const startup = new Audio("/startup.mp3");
 const loop = new Audio("/loop.mp3");
 loop.loop = true;
 
-import allowList from "../../output/aggregated_output.json";
+import allowList from "../../airdrop-merkle-tree/tree.json";
 
 function App() {
   const [soundStarted, setSoundStarted] = useState(false);
