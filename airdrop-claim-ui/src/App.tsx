@@ -36,7 +36,7 @@ function App() {
   const formatTime = (time: number) => (time < 10 ? `0${time}` : time);
 
   const calculateTimeLeft = () => {
-    const difference = +new Date("2024-06-23") - +new Date();
+    const difference = +new Date("2024-07-03") - +new Date();
     let timeLeft: Countdown = {
       days: 0,
       hours: 0,
